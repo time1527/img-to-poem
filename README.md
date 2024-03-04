@@ -2,9 +2,9 @@
 
 ## 写在前面
 
-理想中的实现是输入一张图之后会直接返回一句诗/词/曲（检索优先，如果检索不到再AI生成），即图片$\Rightarrow$诗句。
+理想中的实现是输入一张图之后会直接返回一句诗/词/曲（检索优先，如果检索不到再AI生成），即图片 $\Rightarrow$ 诗句。
 
-但在实践中，暂时的实现是图片$\Rightarrow$英文$\Rightarrow$中文（现代白话文）$\Rightarrow$诗句。这中间可能出现两个gap：
+但在实践中，暂时的实现是图片 $\Rightarrow$ 英文 $\Rightarrow$ 中文（现代白话文） $\Rightarrow$ 诗句。这中间可能出现两个gap：
 
 * 图片-中文，生成文本可能不够丰富，针对这一点提供了文本框用于补充信息
 * 白话文-诗句，暂时两种解决方案：
@@ -19,6 +19,7 @@
 
 1. 在 `LOCALPATH.py`内指定本地路径，主要是RERANK_PATH和EMBEDDING_PATH
 2. 如果不想使用图生文模型，可直接在文本框内填写相关信息
+3. `python run.py`
 
 ## 结构
 
@@ -28,12 +29,13 @@
 
 ```bash
 data
-├── c_data.jsonl
-├── ct_data.jsonl
+├── [works.json]: 数据来自https://github.com/VMIJUNV/chinese-poetry-and-prose
+├── [c_data.jsonl]: 由prepare_data.ipynb和works.json生成
+├── [ct_data.jsonl]: 由prepare_data.ipynb和works.json生成
 ├── prepare_c_db.ipynb
 ├── prepare_ct_db.ipynb
 ├── prepare_data.ipynb
-├── select_c_data.jsonl
+├── [select_c_data.jsonl]: 由prepare_data.ipynb和works.json生成，c_data.jsonl的替代
 ├── vectordb_ct
 │   └── faiss
 │       ├── index.faiss
@@ -44,11 +46,44 @@ data
         └── index.pkl
 ```
 
-## 微调Embedding
+### tools
 
-## 微调LLM
+```bash
+tools
+├── imgtotext.py: 图转文
+└── response.py
+```
+
+## 结果
+原图片来自: https://unsplash.com/t/nature
+
+1. https://unsplash.com/photos/a-snow-covered-mountain-range-with-a-clear-sky-Je7XqcBmDFg?utm_content=creditShareLink&utm_medium=referral&utm_source=unsplash
+
+   Photo by <a href="https://unsplash.com/@eugene_golovesov?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Eugene Golovesov</a> on <a href="https://unsplash.com/photos/a-group-of-trees-that-are-in-the-snow-z994gPo74ck?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
+  
+  ![屏幕截图 2024-03-04 194838](https://github.com/time1527/img-to-poem/assets/154412155/5370ad61-c04a-4760-9ed0-849497e3f12d)
+
+  ![屏幕截图 2024-03-04 194816](https://github.com/time1527/img-to-poem/assets/154412155/e29f2832-d697-4a5a-afad-37216e2d6c49)
+
+2. https://unsplash.com/photos/a-snow-covered-mountain-range-with-a-clear-sky-Je7XqcBmDFg?utm_content=creditShareLink&utm_medium=referral&utm_source=unsplash
+
+   Photo by <a href="https://unsplash.com/@marekpiwnicki?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Marek Piwnicki</a> on <a href="https://unsplash.com/photos/a-snow-covered-mountain-range-with-a-clear-sky-Je7XqcBmDFg?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
+
+   ![屏幕截图 2024-03-04 194910](https://github.com/time1527/img-to-poem/assets/154412155/269f425c-3b74-4c89-b231-ae9aec53412b)
+
+   ![屏幕截图 2024-03-04 200055](https://github.com/time1527/img-to-poem/assets/154412155/b7c8f10a-59b2-4078-869a-e28d62c6ad50)
+
+## 其他
+[微调Embedding](https://github.com/time1527/finetune/tree/main/translation-bge-zh-v1.5)
+
+[微调LLM](https://github.com/time1527/finetune/tree/main/translation-chatglm3-6b)
 
 ## TODO
 
 * [ ] reranker微调
 * [ ] 尝试[Chinese-CLIP](https://github.com/OFA-Sys/Chinese-CLIP)
+
+## 参考
+1. https://github.com/VMIJUNV/chinese-poetry-and-prose
+2. https://pub.towardsai.net/advanced-rag-techniques-an-illustrated-overview-04d193d8fec6
+3. https://unsplash.com/t/nature
