@@ -1,5 +1,11 @@
 # add llm api here
 # qwen
+import os
+import sys
+from LOCALPATH import ENV_PATH
+sys.path.append(ENV_PATH)
+from dotenv import find_dotenv,load_dotenv
+_ = load_dotenv(find_dotenv())
 
 def qwen(prompt,model="qwen-max"):
     from http import HTTPStatus
@@ -18,13 +24,7 @@ def qwen(prompt,model="qwen-max"):
 
 
 # def openai(prompt,model = "gpt-3.5-turbo-1106"):
-#     import os
-#     import sys
-#     sys.path.append("/home/dola")
 #     from openai import OpenAI
-#     from dotenv import find_dotenv,load_dotenv
-#     _ = load_dotenv(find_dotenv())
-
 #     client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY2"),base_url = os.environ.get("OPENAI_BASE_URL2"))
 
 #     response = client.chat.completions.create(

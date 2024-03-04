@@ -28,14 +28,14 @@ def response_c(question,LLM,top_k = 5,query_poem=False):
     if question is None or len(question) < 1:
             return ""
     try:
-        if query_poem == True:
+        if query_poem == True: # TODO
             # 0. default ans from llm
             default_ans = gen_ans(question,LLM)
             query = default_ans
 
             # 1.embedding and vector db 
             EMBEDDING = HuggingFaceEmbeddings(model_name=FT_EMBEDDING_PATH)
-            FAISS_PERSIST_DIRECTORY = "./data/vectordb_c/faiss"
+            FAISS_PERSIST_DIRECTORY = "./data/vectordb_select_c/faiss"
             vectordb = FAISS.load_local(FAISS_PERSIST_DIRECTORY, EMBEDDING)
 
             # 2.retrival

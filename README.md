@@ -17,9 +17,15 @@
 
 ## 运行
 
-1. 在 `LOCALPATH.py`内指定本地路径，主要是RERANK_PATH和EMBEDDING_PATH
+1. 在 `LOCALPATH.py`内指定本地路径，主要是ENV_PATH、RERANK_PATH和EMBEDDING_PATH
 2. 如果不想使用图生文模型，可直接在文本框内填写相关信息
-3. `python run.py`
+3. 创建虚拟环境：`conda create -n imgtopoem python=3.10`
+4. 安装相关：
+   ```bash
+   conda activate imgtopoem
+   pip install -r requirements.txt
+   ```
+5. `python run.py`
 
 ## 结构
 
@@ -55,25 +61,27 @@ tools
 ```
 
 ## 结果
+
 原图片来自: https://unsplash.com/t/nature
 
 1. https://unsplash.com/photos/a-snow-covered-mountain-range-with-a-clear-sky-Je7XqcBmDFg?utm_content=creditShareLink&utm_medium=referral&utm_source=unsplash
 
-   Photo by <a href="https://unsplash.com/@eugene_golovesov?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Eugene Golovesov</a> on <a href="https://unsplash.com/photos/a-group-of-trees-that-are-in-the-snow-z994gPo74ck?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
-  
+   Photo by `<a href="https://unsplash.com/@eugene_golovesov?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">`Eugene Golovesov`</a>` on `<a href="https://unsplash.com/photos/a-group-of-trees-that-are-in-the-snow-z994gPo74ck?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">`Unsplash`</a>`
+
   ![屏幕截图 2024-03-04 194838](https://github.com/time1527/img-to-poem/assets/154412155/5370ad61-c04a-4760-9ed0-849497e3f12d)
 
   ![屏幕截图 2024-03-04 194816](https://github.com/time1527/img-to-poem/assets/154412155/e29f2832-d697-4a5a-afad-37216e2d6c49)
 
 2. https://unsplash.com/photos/a-snow-covered-mountain-range-with-a-clear-sky-Je7XqcBmDFg?utm_content=creditShareLink&utm_medium=referral&utm_source=unsplash
 
-   Photo by <a href="https://unsplash.com/@marekpiwnicki?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Marek Piwnicki</a> on <a href="https://unsplash.com/photos/a-snow-covered-mountain-range-with-a-clear-sky-Je7XqcBmDFg?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
+   Photo by `<a href="https://unsplash.com/@marekpiwnicki?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">`Marek Piwnicki`</a>` on `<a href="https://unsplash.com/photos/a-snow-covered-mountain-range-with-a-clear-sky-Je7XqcBmDFg?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">`Unsplash`</a>`
 
    ![屏幕截图 2024-03-04 194910](https://github.com/time1527/img-to-poem/assets/154412155/269f425c-3b74-4c89-b231-ae9aec53412b)
 
    ![屏幕截图 2024-03-04 200055](https://github.com/time1527/img-to-poem/assets/154412155/b7c8f10a-59b2-4078-869a-e28d62c6ad50)
 
 ## 其他
+
 [微调Embedding](https://github.com/time1527/finetune/tree/main/translation-bge-zh-v1.5)
 
 [微调LLM](https://github.com/time1527/finetune/tree/main/translation-chatglm3-6b)
@@ -84,6 +92,7 @@ tools
 * [ ] 尝试[Chinese-CLIP](https://github.com/OFA-Sys/Chinese-CLIP)
 
 ## 参考
+
 1. https://github.com/VMIJUNV/chinese-poetry-and-prose
 2. https://pub.towardsai.net/advanced-rag-techniques-an-illustrated-overview-04d193d8fec6
 3. https://unsplash.com/t/nature
