@@ -1,0 +1,3 @@
+[submodule "embedding-ft/FlagEmbedding"]
+	path = embedding-ft/FlagEmbedding
+	url = https://github.com/time1527/FlagEmbedding.git
