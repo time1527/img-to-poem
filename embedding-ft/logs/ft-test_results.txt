@@ -1,0 +1,2 @@
+eval_res: (defaultdict(<class 'list'>, {'NDCG@1': 0.91382, 'NDCG@5': 0.9599}), defaultdict(<class 'list'>, {'MAP@1': 0.91382, 'MAP@5': 0.94944}), defaultdict(<class 'list'>, {'Recall@1': 0.91382, 'Recall@5': 0.98997}), defaultdict(<class 'list'>, {'P@1': 0.91382, 'P@5': 0.19799}))
+mrr: defaultdict(<class 'list'>, {'MRR@1': 0.8746, 'MRR@5': 0.929})

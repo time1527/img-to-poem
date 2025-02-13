@@ -1,98 +1,219 @@
-# ImgtoPoem
+# Image2Poem
 
-## 写在前面
+## Question Description
 
-理想中的实现是输入一张图之后会直接返回一句诗/词/曲（检索优先，如果检索不到再AI生成），即图片 $\Rightarrow$ 诗句。
+**问题**：输入一张图返回一句诗/词/曲，$image \to text(poem)$。
 
-但在实践中，暂时的实现是图片 $\Rightarrow$ 英文 $\Rightarrow$ 中文（现代白话文） $\Rightarrow$ 诗句。这中间可能出现两个gap：
+**实现方式1**：VLM。
 
-* 图片-中文，生成文本可能不够丰富，针对这一点提供了文本框用于补充信息
-* 白话文-诗句，暂时两种解决方案：
-  * 使用有翻译的诗句，对应文件 `ct_data.jsonl`，类似Hypothetical Questions的形式存储数据库，缺点是根据数据格式有明确对应翻译的诗句数量有限
-  * 使用所有诗句，对应文件 `c_data.jsonl`，具体而言又有两种方案
-    * 微调嵌入模型：`{query:翻译,pos:[诗句文本],neg:[负样本(诗句))]}`，然后使用白话文作为query去检索诗句
-    * 微调嵌入模型：`{query:翻译+llm生成的诗句,pos:[诗句文本],neg:[负样本(诗句))]}`，在查询时，先让大模型生成一个答案，然后查询+答案拼接去向量数据库检索诗句，或者 `{query:llm生成的诗句,pos:[诗句文本],neg:[负样本(诗句))]}`
+**实现方式2**：image2text检索，涉及到图像编码与诗词编码的对齐。
 
-目前重点放在了“白话文-诗句”gap的解决，但由于“image to poem”是最初的构想，上传图片部分没有取消。
+最朴素的方案：$image \to text[Chinese\ vernacular]\to text[poem]$检索。这可能出现两个gap：
 
-## 运行
+* 图片-中文：生成文本可能不够丰富，针对这一点提供了文本框用于补充信息。
 
-1. 在 `LOCALPATH.py`内指定本地路径，主要是ENV_PATH、RERANK_PATH和EMBEDDING_PATH
-2. 如果不想使用图生文模型，可直接在文本框内填写相关信息
-3. 创建虚拟环境：`conda create -n imgtopoem python=3.10`
-4. 安装相关：
-   ```bash
-   conda activate imgtopoem
-   pip install -r requirements.txt
-   ```
-5. `python run.py`
+* 白话文-诗句，两种解决方案：
+  * 向量数据库使用翻译-诗句对，类似Hypothetical Questions的形式存储，缺点是有明确对应翻译的诗句数量有限。可以使用现有「larger and stronger」LLM 来直接生成相应翻译；也可以使用已有数据对微调LLM，再来生成相应的翻译。
+  
+    >流程：输入图像 $\to$ 生成中文 $\to$ 检索翻译 $\to$ “取出”诗句
+  
+  * 使用所有诗句，微调嵌入模型：`{query:翻译,pos:[诗句文本],neg:[负样本(诗句))]}`，然后使用白话文作为query去检索诗句。
+    
+    >流程：输入图像 $\to$ 生成中文 $\to$​ 检索诗句 
 
-## 结构
+将检索回的诗句、VLM生成的诗句作为候选对，重排序，以防“驴唇不对马嘴”，又能保证考虑到了现有的诗句。
 
-**说明：[]表示不在repo中但可由“来源”或者python文件（在此目录中）得到的内容**
+## Run
 
-### data
+**环境**：
 
-```bash
-data
-├── [works.json]: 数据来自https://github.com/VMIJUNV/chinese-poetry-and-prose
-├── [c_data.jsonl]: 由prepare_data.ipynb和works.json生成
-├── [ct_data.jsonl]: 由prepare_data.ipynb和works.json生成
-├── prepare_c_db.ipynb
-├── prepare_ct_db.ipynb
-├── prepare_data.ipynb
-├── [select_c_data.jsonl]: 由prepare_data.ipynb和works.json生成，c_data.jsonl的替代
-├── vectordb_ct
-│   └── faiss
-│       ├── index.faiss
-│       └── index.pkl
-└── vectordb_select_c
-    └── faiss
-        ├── index.faiss
-        └── index.pkl
+```ps
+conda create -n imgtopoem python=3.10 --y
+conda activate imgtopoem
 ```
 
-### tools
+**option1**：VLM
 
-```bash
-tools
-├── imgtotext.py: 图转文
-└── response.py
+```ps
+pip install -r vlm_requirements.txt
+python run_vlm.py
 ```
 
-## 结果
+**option2**：all = RAG + VLM
 
-原图片来自: https://unsplash.com/t/nature
+```ps
+pip install -r rag_requirements.txt
+```
 
-1. https://unsplash.com/photos/a-snow-covered-mountain-range-with-a-clear-sky-Je7XqcBmDFg?utm_content=creditShareLink&utm_medium=referral&utm_source=unsplash
+修改settings.py；下载[数据集](https://github.com/VMIJUNV/chinese-poetry-and-prose)，并将“作品”解压到WORKS目录下。
 
-   Photo by `<a href="https://unsplash.com/@eugene_golovesov?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">`Eugene Golovesov`</a>` on `<a href="https://unsplash.com/photos/a-group-of-trees-that-are-in-the-snow-z994gPo74ck?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">`Unsplash`</a>`
+```ps
+python data.py
+python run_all.py
+```
 
-  ![屏幕截图 2024-03-04 194838](https://github.com/time1527/img-to-poem/assets/154412155/5370ad61-c04a-4760-9ed0-849497e3f12d)
+## Embedding Finetune
 
-  ![屏幕截图 2024-03-04 194816](https://github.com/time1527/img-to-poem/assets/154412155/e29f2832-d697-4a5a-afad-37216e2d6c49)
+> 2024/03/01微调，2025/02/13整理repo，归并到这里，原repo已本地备份。
 
-2. https://unsplash.com/photos/a-snow-covered-mountain-range-with-a-clear-sky-Je7XqcBmDFg?utm_content=creditShareLink&utm_medium=referral&utm_source=unsplash
+**环境**：
 
-   Photo by `<a href="https://unsplash.com/@marekpiwnicki?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">`Marek Piwnicki`</a>` on `<a href="https://unsplash.com/photos/a-snow-covered-mountain-range-with-a-clear-sky-Je7XqcBmDFg?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">`Unsplash`</a>`
+```ps
+conda create -n flagembedding python=3.10 --y
+conda activate flagembedding
+cd embedding-ft
+git clone https://github.com/time1527/FlagEmbedding.git
+cd FlagEmbedding
+pip install -e .
+pip install faiss-cpu
+pip install tensorboard
+```
 
-   ![屏幕截图 2024-03-04 194910](https://github.com/time1527/img-to-poem/assets/154412155/269f425c-3b74-4c89-b231-ae9aec53412b)
+**数据准备**：
 
-   ![屏幕截图 2024-03-04 200055](https://github.com/time1527/img-to-poem/assets/154412155/b7c8f10a-59b2-4078-869a-e28d62c6ad50)
+```ps
+cd .. 
+# 现在在embedding-ft目录下
+```
 
-## 其他
+准备hard negative mine 数据：
 
-[微调Embedding](https://github.com/time1527/finetune/tree/main/translation-bge-zh-v1.5)
+```ps
+python data.py --function generate_candidate_pool
+```
 
-[微调LLM](https://github.com/time1527/finetune/tree/main/translation-chatglm3-6b)
+hard negative mine：以下命令使用了绝对路径
 
-## TODO
+```ps
+cd FlagEmbedding/scripts/
+python hn_mine.py \
+--input_file /home/pika/Project/img-to-poem/works/ct_works_qpn.jsonl \
+--output_file /home/pika/Project/img-to-poem/works/minedHN.jsonl \
+--candidate_pool /home/pika/Project/img-to-poem/works/candidate_pool.jsonl \
+--range_for_sampling 2-20 \
+--negative_number 9 \
+--embedder_name_or_path /home/pika/Project/img-to-poem/models/bge-base-zh-v1.5
+```
 
-* [ ] reranker微调
-* [ ] 尝试[Chinese-CLIP](https://github.com/OFA-Sys/Chinese-CLIP)
+示例：
 
-## 参考
+```json
+{"query": "南山下田野里种植豆子，结果是草茂盛豆苗疏稀。", "pos": ["种豆南山下，草盛豆苗稀。"], "neg": ["种豆在南野，秫稻盈西畴。", "南亩种豆苗，苗稀草犹胜。", "南山尝种豆，碎荚落风雨。", "种豆在南山，种苗在东皋。", "东皋种禾禾渐焦，南山种豆枯豆苗。", "南山豆苗荒数亩，拂袖先归去，高官鼎内鱼，小吏罝中兔。", "闲来检点南山事，豆子苗生麦又齐。", "种蔬南冈下，地薄旱亦久。", "种田南山下，土薄良苗稀。"]}
+```
+
+划分训练、测试数据集：
+
+```ps
+cd ../..
+# 现在在embeeding-ft目录下
+python data.py --function split_data \
+    --input_file /home/pika/Project/img-to-poem/works/minedHN.jsonl \
+    --train_output_file /home/pika/Project/img-to-poem/works/train.jsonl \
+    --test_output_file /home/pika/Project/img-to-poem/works/test.jsonl
+```
+
+**训练**：
+
+```ps
+torchrun --nproc_per_node 1 \
+-m FlagEmbedding.finetune.embedder.encoder_only.base \
+--model_name_or_path /home/pika/Model/bge-base-zh-v1.5 \
+--cache_dir ./cache/model \
+--output_dir /home/pika/Project/img-to-poem/models/ft-bge-zh-v1.5 \
+--train_data /home/pika/Project/img-to-poem/works/train.jsonl \
+--cache_path ./cache/data \
+--learning_rate 1e-5 \
+--fp16 \
+--num_train_epochs 5 \
+--per_device_train_batch_size 32 \
+--dataloader_drop_last True \
+--normalize_embeddings True \
+--temperature 0.02 \
+--query_max_len 128 \
+--passage_max_len 32 \
+--train_group_size 10 \
+--pad_to_multiple_of 8 \
+--negatives_cross_device \
+--logging_steps 10 \
+--query_instruction_for_retrieval "" \
+--warmup_ratio 0.1 \
+--sentence_pooling_method cls \
+--save_steps 1000 \
+--logging_dir ./logs \
+--report_to tensorboard
+```
+
+损失查看：
+
+```ps
+tensorboard --logdir ./logs
+```
+
+转换成SentenceTransformers模型：
+
+```ps
+python convert.py \
+  --ckpt_dir /home/pika/Project/img-to-poem/models/ft-bge-zh-v1.5/checkpoint-3080 \
+  --out_dir /home/pika/Project/img-to-poem/models/finetuned
+```
+
+**测试**：
+
+准备数据集：
+
+```ps
+python data.py --function prepare_test_data \
+    --candidate_file /home/pika/Project/img-to-poem/works/test.jsonl \
+    --test_file /home/pika/Project/img-to-poem/works/test.jsonl
+```
+
+额外：
+
+```ps
+pip install pytrec_eval
+```
+
+测试微调前：
+
+```ps
+python test.py
+```
+
+测试微调后：
+
+```ps
+python test.py --model_path /home/pika/Project/img-to-poem/models/finetuned --task ft
+```
+
+| Metric   | Fine-tuned | Unfine-tuned |
+| -------- | ---------- | ------------ |
+| NDCG@1   | 0.91382    | 0.64159      |
+| NDCG@5   | 0.95990    | 0.69277      |
+| MAP@1    | 0.91382    | 0.64159      |
+| MAP@5    | 0.94944    | 0.67962      |
+| Recall@1 | 0.91382    | 0.64159      |
+| Recall@5 | 0.98997    | 0.73142      |
+| P@1      | 0.91382    | 0.64159      |
+| P@5      | 0.19799    | 0.14628      |
+| MRR@1    | 0.87460    | 0.61240      |
+| MRR@5    | 0.92900    | 0.66480      |
+
+## Example
+
+Photo by [Marek Piwnicki](https://unsplash.com/@marekpiwnicki?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) on [Unsplash](https://unsplash.com/photos/a-snow-covered-mountain-range-with-a-clear-sky-Je7XqcBmDFg?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)      
+
+![](./assets/example1_1.png)
+
+![](./assets/example1_2.png)
+
+## Timeline
+
+2024-03-01：初版；embedding微调
+
+2025-02-13：整理，添加VLM
+
+## References
 
 1. https://github.com/VMIJUNV/chinese-poetry-and-prose
-2. https://pub.towardsai.net/advanced-rag-techniques-an-illustrated-overview-04d193d8fec6
-3. https://unsplash.com/t/nature
+2. https://github.com/FlagOpen/FlagEmbedding
+3. https://pub.towardsai.net/advanced-rag-techniques-an-illustrated-overview-04d193d8fec6

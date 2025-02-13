@@ -1,6 +1,0 @@
-FT_EMBEDDING_PATH = "/home/dola/finetune/translation-bge-zh-v1.5/ft-bge-zh-v1.5/checkpoint-best"
-EMBEDDING_PATH = "/home/dola/embedding/BAAI/bge-base-zh-v1.5"
-CV_PATH = "/home/dola/model/Salesforce/blip-image-captioning-base"
-RERANK_PATH = "/home/dola/reranker/BAAI/bge-reranker-base"
-WORKS_PATH= "/home/dola/data/works.json"
-ENV_PATH = "/home/dola/"

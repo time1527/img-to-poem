@@ -1,0 +1,12 @@
+faiss-gpu
+fastapi==0.112.2
+gradio==4.19.2
+jq==1.8.0
+langchain==0.3.18
+langchain-community==0.3.17
+langchain-huggingface==0.1.2
+Pillow==10.2.0
+sentence-transformers
+torch==2.2.0
+transformers==4.48.3
+zhon==2.1.1
