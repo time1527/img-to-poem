@@ -39,10 +39,10 @@ pip install -r vlm_requirements.txt
 python run_vlm.py
 ```
 
-**option2**：all = RAG + VLM
+**option2**：all = Retrieval + VLM
 
 ```ps
-pip install -r rag_requirements.txt
+pip install -r all_requirements.txt
 ```
 
 修改settings.py；下载[数据集](https://github.com/VMIJUNV/chinese-poetry-and-prose)，并将“作品”解压到WORKS目录下。

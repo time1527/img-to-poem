@@ -4,14 +4,14 @@ import gradio as gr
 
 repo_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(repo_path)
-from retrieval import rag_content, rag_translation
+from retrieval import retrieve_content, retrieve_translation
 
 
 def generate(image, text, select_data):
     if select_data == "content":
-        return rag_content(image, text)
+        return retrieve_content(image, text)
     else:
-        return rag_translation(image, text)
+        return retrieve_translation(image, text)
 
 
 with gr.Blocks() as demo:

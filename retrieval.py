@@ -11,7 +11,7 @@ from vlm import generate_poem, image_caption
 from db import get_ct_db, get_select_c_db
 
 
-def rag_content(image, text=None, top_k=5):
+def retrieve_content(image, text=None, top_k=5):
     if image is None:
         return "请输入图像。"
     try:
@@ -53,16 +53,16 @@ def rag_content(image, text=None, top_k=5):
         sorted_candidates = [
             c for _, c in sorted(zip(scores, candidates), reverse=True)
         ]
-        ans = list(set(sorted_candidates))[:2]
+        ans = sorted_candidates[:2]
         ans = [
-            f"{c}（使用RAG）" if c != default_ans else f"{c}（使用VLM）" for c in ans
+            f"{c}（使用检索）" if c != default_ans else f"{c}（使用VLM）" for c in ans
         ]
         return "\n".join(ans)
     except Exception as e:
         return e
 
 
-def rag_translation(image, text=None, top_k=5):
+def retrieve_translation(image, text=None, top_k=5):
     """
     content-translation的检索
     将古文放在Document的metadata["content"]中，page_content为对应的翻译
@@ -107,9 +107,9 @@ def rag_translation(image, text=None, top_k=5):
         sorted_candidates = [
             c for _, c in sorted(zip(scores, candidates), reverse=True)
         ]
-        ans = list(set(sorted_candidates))[:2]
+        ans = sorted_candidates[:2]
         ans = [
-            f"{c}（使用RAG）" if c != default_ans else f"{c}（使用VLM）" for c in ans
+            f"{c}（使用检索）" if c != default_ans else f"{c}（使用VLM）" for c in ans
         ]
         return "\n".join(ans)
 
